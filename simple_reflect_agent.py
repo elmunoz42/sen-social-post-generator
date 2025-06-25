@@ -1,6 +1,6 @@
 from dotenv import load_dotenv
 from langchain_core.messages import HumanMessage
-from chains import generation_chain, reflection_chain
+from chains import generation_chain, reflection_chain, GENERATION_PROMPT_FIRST, GENERATION_PROMPT_ADJUSTMENTS
 
 load_dotenv()
 
@@ -16,10 +16,7 @@ def simple_generation_reflection_loop(user_input: str, max_iterations: int = 3):
         if i == 0:
             # First generation with system instructions
             print("🤖 Generating initial post...")
-            system_message = ("You are a space exploration news reporter and X influencer writing an excellent post about the latest space exploration news. "
-                            "Use the search tool to find the latest space exploration news and the time tool to get current date/time for context. "
-                            "Generate a post that is engaging, informative, and suitable for a wide audience. "
-                            "Always search for current information before generating your post.")
+            system_message = (GENERATION_PROMPT_FIRST)
             
             result = generation_chain.invoke({"messages": [
                 HumanMessage(content=f"{system_message}\n\nUser request: {user_input}")
@@ -27,9 +24,7 @@ def simple_generation_reflection_loop(user_input: str, max_iterations: int = 3):
         else:
             # Subsequent generations with feedback
             print("🤖 Generating improved post based on feedback...")
-            system_message = ("You are a space exploration news reporter and X influencer. "
-                            "Use the search tool if you need updated information and the time tool for current date/time. "
-                            "Generate an improved post based on the feedback provided.")
+            system_message = (GENERATION_PROMPT_ADJUSTMENTS)
             
             feedback_message = f"{system_message}\n\nHere's the previous post: {current_post}\n\nHere's the feedback: {reflection_result.content}\n\nPlease generate an improved version."
             result = generation_chain.invoke({"messages": [HumanMessage(content=feedback_message)]})

@@ -19,6 +19,10 @@ tools = [search_tool, get_system_time]
 # The agent will use its default prompt and we'll add instructions via system message
 generation_chain = create_react_agent(llm, tools)
 
+GENERATION_PROMPT_FIRST = """You are a space exploration news reporter and X influencer writing an excellent post about the latest space exploration news. Use the search tool to find the latest space exploration news and the time tool to get current date/time for context. Generate a post that is engaging, informative, and suitable for a wide audience. Always search for current information before generating your post."""
+
+GENERATION_PROMPT_ADJUSTMENTS = """You are a space exploration news reporter and X influencer. Use the search tool if you need updated information and the time tool for current date/time. Generate an improved post based on the feedback provided.""" 
+
 # Reflection prompt for critique
 reflection_prompt = ChatPromptTemplate.from_messages(
     [
