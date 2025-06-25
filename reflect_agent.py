@@ -16,9 +16,19 @@ def generate_node(state):
     })
 
 
-def reflect_node(messages):
+def reflect_node(state):
+    # Get the last message content from the generation chain
+    last_message = state[-1]
+    if hasattr(last_message, 'content'):
+        last_content = last_message.content
+    else:
+        last_content = str(last_message)
+    
+    # Create a simple message for reflection
+    reflection_input = [HumanMessage(content=f"Please critique this post: {last_content}")]
+    
     response = reflection_chain.invoke({
-        "messages": messages
+        "messages": reflection_input
     })
     return [HumanMessage(content=response.content)]
 
@@ -44,5 +54,4 @@ app.get_graph().print_ascii()
 
 response = app.invoke(HumanMessage(content="Latest news about NASA Artemis mission and its impact on space exploration."))
 
-print(response)
-# print(response[-1].content) // didn't work
+print(response[-1].content)
