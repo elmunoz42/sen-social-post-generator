@@ -17,8 +17,8 @@ An AI-powered social media agent that generates engaging space exploration news 
 
 - **`tools.py`**: Defines search and time tools
 - **`chains.py`**: Sets up LLM chains for generation and reflection
-- **`simple_reflect_agent.py`**: Main implementation with generation-reflection loop
-- **`reflect_agent.py`**: Alternative LangGraph-based implementation
+- **`simple_reflect_agent.py`**: Simple loop implementation
+- **`reflect_agent.py`**: LangGraph-based implementation with visual workflow
 
 ### Key Files
 
@@ -26,8 +26,8 @@ An AI-powered social media agent that generates engaging space exploration news 
 sen-social/
 ├── tools.py              # Search and time tools
 ├── chains.py              # LLM chains and prompts
-├── simple_reflect_agent.py  # Main working implementation
-├── reflect_agent.py       # LangGraph version (experimental)
+├── simple_reflect_agent.py  # Simple loop implementation
+├── reflect_agent.py       # LangGraph workflow implementation
 ├── .env                   # API keys
 └── README.md
 ```
@@ -66,7 +66,7 @@ LANGSMITH_PROJECT=sen-social
 
 ## 🎯 Usage
 
-### Simple Generation-Reflection Loop
+### Simple Generation-Reflection Loop (Recommended)
 
 ```bash
 python simple_reflect_agent.py
@@ -79,9 +79,21 @@ This will:
 4. Generate an improved version
 5. Repeat for 3 iterations total
 
+### LangGraph Workflow Implementation
+
+```bash
+python reflect_agent.py
+```
+
+This provides:
+- Visual workflow representation with Mermaid diagrams
+- Graph-based state management
+- Same generation-reflection logic in a more structured format
+
 ### Custom Usage
 
 ```python
+# Simple approach
 from simple_reflect_agent import simple_generation_reflection_loop
 
 final_post = simple_generation_reflection_loop(
@@ -89,6 +101,14 @@ final_post = simple_generation_reflection_loop(
     max_iterations=2
 )
 print(final_post)
+```
+
+```python
+# LangGraph approach
+from reflect_agent import app
+from langchain_core.messages import HumanMessage
+
+response = app.invoke(HumanMessage(content="Your space news query"))
 ```
 
 ## 🔧 Configuration
@@ -108,14 +128,23 @@ In `tools.py`:
 
 ## 🧠 How It Works
 
+### Simple Implementation (`simple_reflect_agent.py`)
 1. **Search Phase**: Agent uses Tavily to find current space exploration news
 2. **Generation Phase**: Creates engaging social media post with current information
 3. **Reflection Phase**: Critiques post for brevity, impact, and virality
 4. **Improvement Phase**: Generates refined version based on feedback
 5. **Iteration**: Repeats reflection and improvement for better results
 
+### LangGraph Implementation (`reflect_agent.py`)
+1. **Visual Workflow**: Displays the generation-reflection process as a graph
+2. **State Management**: Uses LangGraph's state management for message history
+3. **Node-based Processing**: Separate nodes for generation and reflection
+4. **Conditional Routing**: Automatically determines when to stop the loop
+5. **Graph Visualization**: Shows workflow structure with Mermaid diagrams
+
 ## 📊 Example Output
 
+### Simple Reflect Agent
 ```
 --- Iteration 1 ---
 🤖 Generating initial post...
@@ -132,6 +161,22 @@ The post is informative but could be more engaging...
 📝 Generated Post:
 🚀 BREAKING: NASA delays Artemis II to April 2026! 
 Here's what this means for lunar exploration... 🌕
+...
+```
+
+### LangGraph Reflect Agent
+```
+🔄 LangGraph Reflection Agent
+📊 Graph Structure:
+graph TD
+    GENERATE --> REFLECT
+    REFLECT --> GENERATE
+    GENERATE --> END
+
+🚀 Starting generation-reflection loop...
+🎉 Final Result:
+📝 Final Post:
+🚀 BREAKING: NASA delays Artemis II to April 2026! 
 ...
 ```
 
