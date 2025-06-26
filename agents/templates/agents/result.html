@@ -126,7 +126,7 @@
 
                     <!-- Hidden fields -->
                     <input type="hidden" name="original_prompt" value="{{ user_prompt }}">
-                    <input type="hidden" name="conversation_history" value="{{ conversation_history|safe }}">
+                    <input type="hidden" name="conversation_history" value="{{ conversation_history_json }}">
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
@@ -184,14 +184,9 @@
         const autoTitle = userPrompt.length > 50 ? userPrompt.substring(0, 50) + "..." : userPrompt;
         document.getElementById('draftTitle').value = autoTitle;
 
-        // Prepare conversation history for the hidden field
-        const conversationHistory = {{ conversation_history| safe |default: "[]"
-    }};
-    document.querySelector('[name="conversation_history"]').value = JSON.stringify(conversationHistory);
-
-    // Show the modal
-    const modal = new bootstrap.Modal(document.getElementById('saveDraftModal'));
-    modal.show();
-}
+        // Show the modal
+        const modal = new bootstrap.Modal(document.getElementById('saveDraftModal'));
+        modal.show();
+    }
 </script>
 {% endblock %}

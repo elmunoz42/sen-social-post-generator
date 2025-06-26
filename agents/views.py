@@ -50,6 +50,7 @@ def process_prompt(request):
                 'user_prompt': user_prompt,
                 'final_post': result.get('final_post'),
                 'conversation_history': result.get('conversation_history', []),
+                'conversation_history_json': json.dumps(result.get('conversation_history', [])),
                 'success': True
             }
             
