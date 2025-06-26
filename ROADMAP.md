@@ -81,6 +81,54 @@ sen-social/
 - [ ] **Agent configuration** options (temperature, max iterations)
 - [ ] **Response formatting** and styling
 
+### 2.4 Template Engine Upgrade (Jinja2 Migration)
+- [ ] **Install django-jinja** package
+- [ ] **Configure Jinja2 backend** in Django settings
+- [ ] **Create Jinja2 environment** configuration file
+- [ ] **Convert problematic templates** from Django syntax to Jinja2
+  - [ ] `post_edit.html` → `post_edit.jinja`
+  - [ ] `post_list.html` → `post_list.jinja` 
+  - [ ] `post_detail.html` → `post_detail.jinja`
+- [ ] **Update view functions** to use `.jinja` templates
+- [ ] **Create base Jinja2 template** (`base.jinja`)
+- [ ] **Test template logic** (comparisons, conditionals, loops)
+- [ ] **Migrate remaining complex templates** as needed
+
+**Benefits:**
+- ✅ **HubSpot-like syntax** (familiar templating)
+- ✅ **Logical comparisons** (`{% if post.status == 'draft' %}`)
+- ✅ **Better filters** and string manipulation
+- ✅ **Cleaner conditionals** and loops
+- ✅ **No more Django template limitations**
+
+**Files to Create:**
+```
+config/jinja2.py              # Jinja2 environment configuration
+agents/templates/agents/
+├── post_edit.jinja          # Converted from .html
+├── post_list.jinja          # Converted from .html
+├── post_detail.jinja        # Converted from .html
+└── dashboard.jinja          # Converted from .html
+templates/
+└── base.jinja               # Base Jinja2 template
+```
+
+**Template Syntax Examples:**
+```jinja2
+{# Clean status selection #}
+<option value="{{ value }}" {{ 'selected' if post.status == value else '' }}>
+    {{ label }}
+</option>
+
+{# Logical status badges #}
+<span class="badge bg-{{ 'success' if post.status == 'published' else 'warning' }}">
+    {{ post.get_status_display() }}
+</span>
+
+{# Better string manipulation #}
+{{ post.content[:100] + '...' if post.content|length > 100 else post.content }}
+```
+
 ---
 
 ## 🔧 Phase 3: Advanced Features (Week 3-4)
@@ -205,6 +253,7 @@ sen-social/
 
 ### Phase 1-4 (Django)
 - **Framework**: Django 5.x
+- **Templates**: Django Templates + Jinja2 (upgraded in Phase 2.4)
 - **Database**: SQLite (dev) → PostgreSQL (prod)
 - **Frontend**: HTML/CSS/JS with Bootstrap/Tailwind
 - **Real-time**: Django Channels + WebSocket
