@@ -1,0 +1,135 @@
+{% extends 'base.html' %}
+
+{% block title %}Results - Sen-Social Agent{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-lg-10 mx-auto">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h2><i class="fas fa-chart-line"></i> Generation Results</h2>
+                <a href="{% url 'agents:dashboard' %}" class="btn btn-secondary">
+                    <i class="fas fa-arrow-left"></i> New Request
+                </a>
+            </div>
+
+            <!-- Original Prompt -->
+            <div class="card mb-4">
+                <div class="card-header bg-info text-white">
+                    <h5 class="mb-0"><i class="fas fa-user"></i> Your Request</h5>
+                </div>
+                <div class="card-body">
+                    <p class="mb-0">{{ user_prompt }}</p>
+                </div>
+            </div>
+
+            <!-- Final Result -->
+            {% if final_post %}
+            <div class="final-result mb-4">
+                <h4><i class="fas fa-trophy text-success"></i> Final Generated Content</h4>
+                <div class="mt-3">
+                    <div class="bg-white p-3 border rounded">
+                        {{ final_post|linebreaks }}
+                    </div>
+                </div>
+                <div class="mt-3 d-flex gap-2">
+                    <button class="btn btn-outline-primary btn-sm" onclick="copyToClipboard()">
+                        <i class="fas fa-copy"></i> Copy Content
+                    </button>
+                    <button class="btn btn-outline-success btn-sm" onclick="downloadContent()">
+                        <i class="fas fa-download"></i> Download
+                    </button>
+                </div>
+            </div>
+            {% endif %}
+
+            <!-- Conversation History -->
+            {% if conversation_history %}
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0">
+                        <i class="fas fa-comments"></i> Generation & Reflection Process 
+                        <span class="badge bg-secondary">{{ conversation_history|length }} steps</span>
+                    </h5>
+                </div>
+                <div class="card-body">
+                    {% for message in conversation_history %}
+                    <div class="conversation-step {% if message.is_feedback %}feedback-step{% else %}generation-step{% endif %}">
+                        <div class="d-flex align-items-start">
+                            <div class="me-3">
+                                {% if message.is_feedback %}
+                                    <i class="fas fa-eye text-warning fa-lg"></i>
+                                {% else %}
+                                    <i class="fas fa-magic text-success fa-lg"></i>
+                                {% endif %}
+                            </div>
+                            <div class="flex-grow-1">
+                                <h6 class="mb-2">
+                                    {% if message.is_feedback %}
+                                        <span class="text-warning">Reflection Step</span>
+                                    {% else %}
+                                        <span class="text-success">Generation Step</span>
+                                    {% endif %}
+                                    <small class="text-muted">#{{ forloop.counter }}</small>
+                                </h6>
+                                <div class="content">
+                                    {{ message.content|linebreaks }}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+            {% endif %}
+
+            <!-- Action Buttons -->
+            <div class="mt-4 text-center">
+                <a href="{% url 'agents:dashboard' %}" class="btn btn-primary btn-lg">
+                    <i class="fas fa-plus"></i> Generate New Content
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Hidden textarea for copying -->
+<textarea id="copyTextarea" style="position: absolute; left: -9999px;">{{ final_post }}</textarea>
+{% endblock %}
+
+{% block scripts %}
+<script>
+function copyToClipboard() {
+    const textarea = document.getElementById('copyTextarea');
+    textarea.select();
+    textarea.setSelectionRange(0, 99999); // For mobile devices
+    navigator.clipboard.writeText(textarea.value).then(function() {
+        // Show success message
+        const btn = event.target.closest('button');
+        const originalText = btn.innerHTML;
+        btn.innerHTML = '<i class="fas fa-check"></i> Copied!';
+        btn.classList.remove('btn-outline-primary');
+        btn.classList.add('btn-success');
+        
+        setTimeout(() => {
+            btn.innerHTML = originalText;
+            btn.classList.remove('btn-success');
+            btn.classList.add('btn-outline-primary');
+        }, 2000);
+    });
+}
+
+function downloadContent() {
+    const content = document.getElementById('copyTextarea').value;
+    const blob = new Blob([content], { type: 'text/plain' });
+    const url = window.URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'generated-content.txt';
+    document.body.appendChild(a);
+    a.click();
+    window.URL.revokeObjectURL(url);
+    document.body.removeChild(a);
+}
+</script>
+{% endblock %}
