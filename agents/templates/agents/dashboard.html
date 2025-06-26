@@ -8,7 +8,8 @@
         <div class="row">
             <div class="col-lg-8 mx-auto text-center">
                 <h1><i class="fas fa-rocket"></i> LangGraph Reflection Agent</h1>
-                <p class="lead">Transform your ideas into refined social media content through AI-powered generation and reflection.</p>
+                <p class="lead">Transform your ideas into refined social media content through AI-powered generation and
+                    reflection.</p>
             </div>
         </div>
     </div>
@@ -18,12 +19,12 @@
     <div class="row">
         <div class="col-lg-8 mx-auto">
             {% if messages %}
-                {% for message in messages %}
-                    <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
-                        {{ message }}
-                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-                    </div>
-                {% endfor %}
+            {% for message in messages %}
+            <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                {{ message }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+            {% endfor %}
             {% endif %}
 
             <div class="card shadow">
@@ -35,16 +36,12 @@
                         {% csrf_token %}
                         <div class="mb-3">
                             <label for="prompt" class="form-label">Enter your content request:</label>
-                            <textarea 
-                                class="form-control" 
-                                id="prompt" 
-                                name="prompt" 
-                                rows="4" 
+                            <textarea class="form-control" id="prompt" name="prompt" rows="4"
                                 placeholder="e.g., Latest news about NASA Artemis mission and its impact on space exploration..."
-                                required
-                            ></textarea>
+                                required></textarea>
                             <div class="form-text">
-                                The agent will search for current information, generate content, reflect on it, and refine it through multiple iterations.
+                                The agent will search for current information, generate content, reflect on it, and
+                                refine it through multiple iterations.
                             </div>
                         </div>
                         <div class="d-grid">
@@ -53,7 +50,7 @@
                             </button>
                         </div>
                     </form>
-                    
+
                     <div class="loading mt-3" id="loadingDiv">
                         <div class="text-center">
                             <div class="spinner-border text-primary" role="status">
@@ -104,10 +101,10 @@
 
 {% block scripts %}
 <script>
-document.getElementById('promptForm').addEventListener('submit', function() {
-    document.getElementById('submitBtn').disabled = true;
-    document.getElementById('loadingDiv').style.display = 'block';
-    document.getElementById('submitBtn').innerHTML = '<i class="fas fa-spinner fa-spin"></i> Processing...';
-});
+    document.getElementById('promptForm').addEventListener('submit', function () {
+        document.getElementById('submitBtn').disabled = true;
+        document.getElementById('loadingDiv').style.display = 'block';
+        document.getElementById('submitBtn').innerHTML = '<i class="fas fa-spinner fa-spin"></i> Processing...';
+    });
 </script>
 {% endblock %}

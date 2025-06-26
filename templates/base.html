@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -10,35 +11,42 @@
         .navbar-brand {
             font-weight: bold;
         }
+
         .agent-header {
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             color: white;
             padding: 2rem 0;
         }
+
         .conversation-step {
             border-left: 4px solid #007bff;
             padding-left: 1rem;
             margin-bottom: 1rem;
         }
+
         .feedback-step {
             border-left: 4px solid #ffc107;
             background-color: #fff9e6;
         }
+
         .generation-step {
             border-left: 4px solid #28a745;
             background-color: #f1f9f1;
         }
+
         .final-result {
             border: 2px solid #28a745;
             background-color: #f8fff8;
             border-radius: 8px;
             padding: 1.5rem;
         }
+
         .loading {
             display: none;
         }
     </style>
 </head>
+
 <body>
     <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
         <div class="container">
@@ -47,16 +55,19 @@
             </a>
             <div class="navbar-nav ms-auto">
                 {% if user.is_authenticated %}
-                    <span class="navbar-text me-3">
-                        Welcome, {{ user.username }}!
-                    </span>
-                    <a class="nav-link" href="{% url 'logout' %}">
-                        <i class="fas fa-sign-out-alt"></i> Logout
-                    </a>
+                <a class="nav-link" href="{% url 'agents:post_list' %}">
+                    <i class="fas fa-list"></i> My Posts
+                </a>
+                <span class="navbar-text me-3">
+                    Welcome, {{ user.username }}!
+                </span>
+                <a class="nav-link" href="{% url 'logout' %}">
+                    <i class="fas fa-sign-out-alt"></i> Logout
+                </a>
                 {% else %}
-                    <a class="nav-link" href="{% url 'login' %}">
-                        <i class="fas fa-sign-in-alt"></i> Login
-                    </a>
+                <a class="nav-link" href="{% url 'login' %}">
+                    <i class="fas fa-sign-in-alt"></i> Login
+                </a>
                 {% endif %}
             </div>
         </div>
@@ -71,4 +82,5 @@
     {% block scripts %}
     {% endblock %}
 </body>
+
 </html>

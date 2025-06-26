@@ -13,11 +13,11 @@
                 </div>
                 <div class="card-body">
                     {% if form.errors %}
-                        <div class="alert alert-danger">
-                            {{ form.errors }}
-                        </div>
+                    <div class="alert alert-danger">
+                        {{ form.errors }}
+                    </div>
                     {% endif %}
-                    
+
                     <form method="post">
                         {% csrf_token %}
                         <div class="mb-3">
@@ -44,8 +44,8 @@
 </div>
 
 <style>
-.form-control {
-    margin-bottom: 0;
-}
+    .form-control {
+        margin-bottom: 0;
+    }
 </style>
 {% endblock %}

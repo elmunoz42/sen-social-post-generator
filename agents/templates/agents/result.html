@@ -39,6 +39,9 @@
                     <button class="btn btn-outline-success btn-sm" onclick="downloadContent()">
                         <i class="fas fa-download"></i> Download
                     </button>
+                    <button class="btn btn-outline-warning btn-sm" onclick="showSaveDraftModal()">
+                        <i class="fas fa-save"></i> Save Draft
+                    </button>
                 </div>
             </div>
             {% endif %}
@@ -48,27 +51,28 @@
             <div class="card">
                 <div class="card-header">
                     <h5 class="mb-0">
-                        <i class="fas fa-comments"></i> Generation & Reflection Process 
+                        <i class="fas fa-comments"></i> Generation & Reflection Process
                         <span class="badge bg-secondary">{{ conversation_history|length }} steps</span>
                     </h5>
                 </div>
                 <div class="card-body">
                     {% for message in conversation_history %}
-                    <div class="conversation-step {% if message.is_feedback %}feedback-step{% else %}generation-step{% endif %}">
+                    <div
+                        class="conversation-step {% if message.is_feedback %}feedback-step{% else %}generation-step{% endif %}">
                         <div class="d-flex align-items-start">
                             <div class="me-3">
                                 {% if message.is_feedback %}
-                                    <i class="fas fa-eye text-warning fa-lg"></i>
+                                <i class="fas fa-eye text-warning fa-lg"></i>
                                 {% else %}
-                                    <i class="fas fa-magic text-success fa-lg"></i>
+                                <i class="fas fa-magic text-success fa-lg"></i>
                                 {% endif %}
                             </div>
                             <div class="flex-grow-1">
                                 <h6 class="mb-2">
                                     {% if message.is_feedback %}
-                                        <span class="text-warning">Reflection Step</span>
+                                    <span class="text-warning">Reflection Step</span>
                                     {% else %}
-                                        <span class="text-success">Generation Step</span>
+                                    <span class="text-success">Generation Step</span>
                                     {% endif %}
                                     <small class="text-muted">#{{ forloop.counter }}</small>
                                 </h6>
@@ -88,7 +92,49 @@
                 <a href="{% url 'agents:dashboard' %}" class="btn btn-primary btn-lg">
                     <i class="fas fa-plus"></i> Generate New Content
                 </a>
+                <a href="{% url 'agents:post_list' %}" class="btn btn-outline-secondary btn-lg">
+                    <i class="fas fa-list"></i> View My Posts
+                </a>
             </div>
+        </div>
+    </div>
+</div>
+
+<!-- Save Draft Modal -->
+<div class="modal fade" id="saveDraftModal" tabindex="-1" aria-labelledby="saveDraftModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <form method="post" action="{% url 'agents:save_draft' %}">
+                {% csrf_token %}
+                <div class="modal-header">
+                    <h5 class="modal-title" id="saveDraftModalLabel">
+                        <i class="fas fa-save"></i> Save as Draft
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label for="draftTitle" class="form-label">Post Title</label>
+                        <input type="text" class="form-control" id="draftTitle" name="title" required
+                            placeholder="Enter a title for this post...">
+                    </div>
+                    <div class="mb-3">
+                        <label for="draftContent" class="form-label">Content Preview</label>
+                        <textarea class="form-control" id="draftContent" name="content" rows="6"
+                            readonly>{{ final_post }}</textarea>
+                    </div>
+
+                    <!-- Hidden fields -->
+                    <input type="hidden" name="original_prompt" value="{{ user_prompt }}">
+                    <input type="hidden" name="conversation_history" value="{{ conversation_history|safe }}">
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-warning">
+                        <i class="fas fa-save"></i> Save Draft
+                    </button>
+                </div>
+            </form>
         </div>
     </div>
 </div>
@@ -99,37 +145,53 @@
 
 {% block scripts %}
 <script>
-function copyToClipboard() {
-    const textarea = document.getElementById('copyTextarea');
-    textarea.select();
-    textarea.setSelectionRange(0, 99999); // For mobile devices
-    navigator.clipboard.writeText(textarea.value).then(function() {
-        // Show success message
-        const btn = event.target.closest('button');
-        const originalText = btn.innerHTML;
-        btn.innerHTML = '<i class="fas fa-check"></i> Copied!';
-        btn.classList.remove('btn-outline-primary');
-        btn.classList.add('btn-success');
-        
-        setTimeout(() => {
-            btn.innerHTML = originalText;
-            btn.classList.remove('btn-success');
-            btn.classList.add('btn-outline-primary');
-        }, 2000);
-    });
-}
+    function copyToClipboard() {
+        const textarea = document.getElementById('copyTextarea');
+        textarea.select();
+        textarea.setSelectionRange(0, 99999); // For mobile devices
+        navigator.clipboard.writeText(textarea.value).then(function () {
+            // Show success message
+            const btn = event.target.closest('button');
+            const originalText = btn.innerHTML;
+            btn.innerHTML = '<i class="fas fa-check"></i> Copied!';
+            btn.classList.remove('btn-outline-primary');
+            btn.classList.add('btn-success');
 
-function downloadContent() {
-    const content = document.getElementById('copyTextarea').value;
-    const blob = new Blob([content], { type: 'text/plain' });
-    const url = window.URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = 'generated-content.txt';
-    document.body.appendChild(a);
-    a.click();
-    window.URL.revokeObjectURL(url);
-    document.body.removeChild(a);
+            setTimeout(() => {
+                btn.innerHTML = originalText;
+                btn.classList.remove('btn-success');
+                btn.classList.add('btn-outline-primary');
+            }, 2000);
+        });
+    }
+
+    function downloadContent() {
+        const content = document.getElementById('copyTextarea').value;
+        const blob = new Blob([content], { type: 'text/plain' });
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = 'generated-content.txt';
+        document.body.appendChild(a);
+        a.click();
+        window.URL.revokeObjectURL(url);
+        document.body.removeChild(a);
+    }
+
+    function showSaveDraftModal() {
+        // Auto-generate a title based on the user prompt
+        const userPrompt = "{{ user_prompt|escapejs }}";
+        const autoTitle = userPrompt.length > 50 ? userPrompt.substring(0, 50) + "..." : userPrompt;
+        document.getElementById('draftTitle').value = autoTitle;
+
+        // Prepare conversation history for the hidden field
+        const conversationHistory = {{ conversation_history| safe |default: "[]"
+    }};
+    document.querySelector('[name="conversation_history"]').value = JSON.stringify(conversationHistory);
+
+    // Show the modal
+    const modal = new bootstrap.Modal(document.getElementById('saveDraftModal'));
+    modal.show();
 }
 </script>
 {% endblock %}
