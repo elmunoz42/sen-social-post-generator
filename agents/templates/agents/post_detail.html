@@ -31,38 +31,45 @@
                 </small>
             </div>
 
-            <!-- Social Media Share Buttons -->
+            <!-- Share & Actions -->
             <div class="card mb-4">
                 <div class="card-header">
-                    <h6 class="mb-0"><i class="fas fa-share-alt"></i> Share on Social Media</h6>
+                    <h6 class="mb-0"><i class="fas fa-share-alt"></i> Share & Actions</h6>
                 </div>
                 <div class="card-body">
                     <div class="d-flex flex-wrap gap-2">
-                        <!-- Twitter/X Share -->
+                        <!-- Social Media Share Buttons -->
                         <a href="#" onclick="shareOnTwitter()" class="btn btn-outline-dark">
-                            <i class="fab fa-x-twitter"></i> Share on X
+                            <i class="fab fa-x-twitter"></i> X
                         </a>
-
-                        <!-- Facebook Share -->
                         <a href="#" onclick="shareOnFacebook()" class="btn btn-outline-primary">
-                            <i class="fab fa-facebook"></i> Share on Facebook
+                            <i class="fab fa-facebook"></i> Facebook
                         </a>
-
-                        <!-- LinkedIn Share -->
                         <a href="#" onclick="shareOnLinkedIn()" class="btn btn-outline-info">
-                            <i class="fab fa-linkedin"></i> Share on LinkedIn
+                            <i class="fab fa-linkedin"></i> LinkedIn
                         </a>
-
-                        <!-- Instagram Copy -->
                         <button onclick="copyForInstagram()" class="btn btn-outline-danger">
-                            <i class="fab fa-instagram"></i> Copy for Instagram
+                            <i class="fab fa-instagram"></i> Instagram
                         </button>
+
+                        <!-- Separator -->
+                        <div class="vr d-none d-md-block"></div>
+
+                        <!-- Action Buttons -->
+                        <button class="btn btn-outline-secondary" onclick="copyToClipboard()">
+                            <i class="fas fa-copy"></i> Copy
+                        </button>
+                        <button class="btn btn-outline-success" onclick="downloadContent()">
+                            <i class="fas fa-download"></i> Download
+                        </button>
+                        <a href="{% url 'agents:post_edit' post.id %}" class="btn btn-outline-warning">
+                            <i class="fas fa-edit"></i> Edit
+                        </a>
                     </div>
                     <div class="mt-2">
                         <small class="text-muted">
                             <i class="fas fa-info-circle"></i>
-                            Click to open native share dialogs for each platform. Instagram content will be copied to
-                            your clipboard.
+                            Share on social platforms or manage your content with copy, download, and edit options.
                         </small>
                     </div>
                 </div>
@@ -123,19 +130,6 @@
                 </div>
             </div>
             {% endif %}
-
-            <!-- Actions -->
-            <div class="d-flex gap-2 mb-4">
-                <button class="btn btn-outline-primary" onclick="copyToClipboard()">
-                    <i class="fas fa-copy"></i> Copy Content
-                </button>
-                <button class="btn btn-outline-success" onclick="downloadContent()">
-                    <i class="fas fa-download"></i> Download
-                </button>
-                <a href="{% url 'agents:post_edit' post.id %}" class="btn btn-outline-warning">
-                    <i class="fas fa-edit"></i> Edit Post
-                </a>
-            </div>
         </div>
     </div>
 </div>
