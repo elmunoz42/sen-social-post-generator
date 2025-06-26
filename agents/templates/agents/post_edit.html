@@ -1,0 +1,264 @@
+{% extends 'base.html' %}
+
+{% block title %}Edit Post - Sen-Social Agent{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-lg-8 mx-auto">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h2><i class="fas fa-edit"></i> Edit Post</h2>
+                <div class="btn-group" role="group">
+                    <a href="{% url 'agents:post_detail' post.id %}" class="btn btn-outline-secondary">
+                        <i class="fas fa-eye"></i> View Post
+                    </a>
+                    <a href="{% url 'agents:post_list' %}" class="btn btn-outline-secondary">
+                        <i class="fas fa-arrow-left"></i> Back to Posts
+                    </a>
+                </div>
+            </div>
+
+            {% if messages %}
+            {% for message in messages %}
+            <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                {{ message }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+            {% endfor %}
+            {% endif %}
+
+            <form method="post" action="{% url 'agents:post_edit' post.id %}">
+                {% csrf_token %}
+
+                <!-- Title Field -->
+                <div class="card mb-4">
+                    <div class="card-header">
+                        <h5 class="mb-0"><i class="fas fa-heading"></i> Post Title</h5>
+                    </div>
+                    <div class="card-body">
+                        <input type="text" class="form-control" id="title" name="title" value="{{ post.title }}"
+                            required maxlength="200" placeholder="Enter a title for this post">
+                        <div class="form-text">Brief title for this post (max 200 characters)</div>
+                    </div>
+                </div>
+
+                <!-- Content Field -->
+                <div class="card mb-4">
+                    <div class="card-header">
+                        <h5 class="mb-0"><i class="fas fa-file-text"></i> Post Content</h5>
+                    </div>
+                    <div class="card-body">
+                        <textarea class="form-control" id="content" name="content" rows="12" required
+                            placeholder="Enter the post content">{{ post.content }}</textarea>
+                        <div class="form-text">
+                            <i class="fas fa-chart-bar"></i>
+                            <span id="wordCount">{{ post.word_count }}</span> words
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Status Field -->
+                <div class="card mb-4">
+                    <div class="card-header">
+                        <h5 class="mb-0"><i class="fas fa-flag"></i> Post Status</h5>
+                    </div>
+                    <div class="card-body">
+                        <select class="form-select" id="status" name="status">
+                            {% for choice in status_choices %}
+                            <option value="{{ choice.value }}" {% if choice.selected %}selected{% endif %}>
+                                {{ choice.label }}
+                            </option>
+                            {% endfor %}
+                        </select>
+                        <div class="form-text">
+                            <strong>Draft:</strong> Work in progress<br>
+                            <strong>Published:</strong> Ready for use<br>
+                            <strong>Archived:</strong> No longer active
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Original Prompt (Read-only) -->
+                {% if post.original_prompt %}
+                <div class="card mb-4">
+                    <div class="card-header">
+                        <h6 class="mb-0"><i class="fas fa-question"></i> Original Prompt</h6>
+                    </div>
+                    <div class="card-body">
+                        <div class="bg-light p-3 rounded">
+                            <p class="mb-0 text-muted">{{ post.original_prompt }}</p>
+                        </div>
+                        <div class="form-text">This is the original prompt that generated this content (read-only)</div>
+                    </div>
+                </div>
+                {% endif %}
+
+                <!-- Metadata (Read-only) -->
+                <div class="card mb-4">
+                    <div class="card-header">
+                        <h6 class="mb-0"><i class="fas fa-info-circle"></i> Post Information</h6>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <small class="text-muted">
+                                    <strong>Created:</strong> {{ post.created_at|date:"M d, Y, g:i A" }}
+                                </small>
+                            </div>
+                            <div class="col-md-6">
+                                <small class="text-muted">
+                                    <strong>Last Updated:</strong> {{ post.updated_at|date:"M d, Y, g:i A" }}
+                                </small>
+                            </div>
+                        </div>
+                        {% if post.conversation_history %}
+                        <div class="mt-2">
+                            <small class="text-muted">
+                                <strong>Generation Steps:</strong> {{ post.conversation_history|length }}
+                            </small>
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <!-- Action Buttons -->
+                <div class="d-flex gap-2 mb-4">
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-save"></i> Save Changes
+                    </button>
+                    <a href="{% url 'agents:post_detail' post.id %}" class="btn btn-outline-secondary">
+                        <i class="fas fa-times"></i> Cancel
+                    </a>
+                    <button type="button" class="btn btn-outline-info" onclick="previewContent()">
+                        <i class="fas fa-eye"></i> Preview
+                    </button>
+                    <button type="button" class="btn btn-outline-success" onclick="copyContent()">
+                        <i class="fas fa-copy"></i> Copy Content
+                    </button>
+                </div>
+            </form>
+
+            <!-- Danger Zone -->
+            <div class="card border-danger mb-4">
+                <div class="card-header bg-danger text-white">
+                    <h6 class="mb-0"><i class="fas fa-exclamation-triangle"></i> Danger Zone</h6>
+                </div>
+                <div class="card-body">
+                    <p class="mb-2">Delete this post permanently. This action cannot be undone.</p>
+                    <a href="{% url 'agents:post_delete' post.id %}" class="btn btn-outline-danger">
+                        <i class="fas fa-trash"></i> Delete Post
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Preview Modal -->
+<div class="modal fade" id="previewModal" tabindex="-1" aria-labelledby="previewModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="previewModalLabel">
+                    <i class="fas fa-eye"></i> Content Preview
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <h6 id="previewTitle"></h6>
+                <hr>
+                <div id="previewContent" class="bg-light p-3 rounded"></div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Hidden textarea for copying -->
+<textarea id="copyTextarea" style="position: absolute; left: -9999px;"></textarea>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    // Word count functionality
+    const contentTextarea = document.getElementById('content');
+    const wordCountSpan = document.getElementById('wordCount');
+
+    function updateWordCount() {
+        const text = contentTextarea.value.trim();
+        const wordCount = text ? text.split(/\s+/).length : 0;
+        wordCountSpan.textContent = wordCount;
+    }
+
+    contentTextarea.addEventListener('input', updateWordCount);
+
+    // Preview functionality
+    function previewContent() {
+        const title = document.getElementById('title').value || 'Untitled Post';
+        const content = document.getElementById('content').value || 'No content';
+
+        document.getElementById('previewTitle').textContent = title;
+        document.getElementById('previewContent').innerHTML = content.replace(/\n/g, '<br>');
+
+        const modal = new bootstrap.Modal(document.getElementById('previewModal'));
+        modal.show();
+    }
+
+    // Copy functionality
+    function copyContent() {
+        const content = document.getElementById('content').value;
+        const textarea = document.getElementById('copyTextarea');
+        textarea.value = content;
+        textarea.select();
+
+        navigator.clipboard.writeText(content).then(function () {
+            const btn = event.target.closest('button');
+            const originalText = btn.innerHTML;
+            btn.innerHTML = '<i class="fas fa-check"></i> Copied!';
+            btn.classList.remove('btn-outline-success');
+            btn.classList.add('btn-success');
+
+            setTimeout(() => {
+                btn.innerHTML = originalText;
+                btn.classList.remove('btn-success');
+                btn.classList.add('btn-outline-success');
+            }, 2000);
+        });
+    }
+
+    // Auto-save functionality (optional)
+    let autoSaveTimeout;
+    function scheduleAutoSave() {
+        clearTimeout(autoSaveTimeout);
+        autoSaveTimeout = setTimeout(() => {
+            // Could implement auto-save here if needed
+            console.log('Auto-save triggered');
+        }, 30000); // 30 seconds
+    }
+
+    contentTextarea.addEventListener('input', scheduleAutoSave);
+    document.getElementById('title').addEventListener('input', scheduleAutoSave);
+
+    // Form validation
+    document.querySelector('form').addEventListener('submit', function (e) {
+        const title = document.getElementById('title').value.trim();
+        const content = document.getElementById('content').value.trim();
+
+        if (!title) {
+            e.preventDefault();
+            alert('Please enter a title for this post.');
+            document.getElementById('title').focus();
+            return;
+        }
+
+        if (!content) {
+            e.preventDefault();
+            alert('Please enter some content for this post.');
+            document.getElementById('content').focus();
+            return;
+        }
+    });
+</script>
+{% endblock %}

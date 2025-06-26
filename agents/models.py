@@ -63,3 +63,13 @@ class Post(models.Model):
         """Mark the post as archived"""
         self.status = 'archived'
         self.save()
+    
+    @property
+    def status_css_class(self):
+        """Return the CSS class for the post status badge"""
+        status_classes = {
+            'draft': 'bg-warning',
+            'published': 'bg-success',
+            'archived': 'bg-secondary',
+        }
+        return status_classes.get(self.status, 'bg-secondary')

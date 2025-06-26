@@ -20,9 +20,7 @@
 
             <!-- Post Status -->
             <div class="mb-3">
-                <span
-                    class="badge 
-                    {% if post.status == 'draft' %}bg-warning{% elif post.status == 'published' %}bg-success{% else %}bg-secondary{% endif %} fs-6">
+                <span class="badge {{ post.status_css_class }} fs-6">
                     {{ post.get_status_display }}
                 </span>
                 <small class="text-muted ms-2">

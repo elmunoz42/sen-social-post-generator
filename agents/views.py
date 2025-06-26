@@ -204,9 +204,18 @@ def post_edit(request, post_id):
             logger.error(f"Error updating post: {str(e)}")
             messages.error(request, f'Error updating post: {str(e)}')
     
+    # Prepare status choices with selection flags
+    status_choices_with_selection = []
+    for value, label in Post.STATUS_CHOICES:
+        status_choices_with_selection.append({
+            'value': value,
+            'label': label,
+            'selected': post.status == value
+        })
+    
     context = {
         'post': post,
-        'status_choices': Post.STATUS_CHOICES
+        'status_choices': status_choices_with_selection
     }
     
     return render(request, 'agents/post_edit.html', context)

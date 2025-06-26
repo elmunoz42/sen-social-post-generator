@@ -50,9 +50,7 @@
                     <div class="card h-100">
                         <div class="card-header d-flex justify-content-between align-items-center">
                             <h6 class="mb-0">{{ post.title }}</h6>
-                            <span
-                                class="badge 
-                                    {% if post.status == 'draft' %}bg-warning{% elif post.status == 'published' %}bg-success{% else %}bg-secondary{% endif %}">
+                            <span class="badge {{ post.status_css_class }}">
                                 {{ post.get_status_display }}
                             </span>
                         </div>
