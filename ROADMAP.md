@@ -129,6 +129,82 @@ templates/
 {{ post.content[:100] + '...' if post.content|length > 100 else post.content }}
 ```
 
+### 2.5 Social Media Share Integration
+- [ ] **Add social media share buttons** to post detail and edit views
+- [ ] **Implement share functionality** for major platforms:
+  - [ ] **Twitter/X** - Share with proper character limits and hashtags
+  - [ ] **Facebook** - Share post content with URL encoding
+  - [ ] **LinkedIn** - Professional sharing format
+  - [ ] **Instagram** - Copy content for manual posting (due to API limitations)
+- [ ] **Create JavaScript functions** for share window handling
+- [ ] **Add platform-specific formatting** and optimizations
+- [ ] **Include share analytics** (optional tracking)
+
+**Implementation Details:**
+- 🚀 **No API integration required** - uses native share URLs
+- 🎯 **Platform-specific optimizations** (character limits, hashtags)
+- 📱 **Mobile-friendly** share dialogs
+- 🔗 **URL encoding** for proper content sharing
+- 📊 **Click tracking** (optional analytics)
+
+**Share Button Examples:**
+```html
+<!-- Twitter/X Share -->
+<a href="https://twitter.com/intent/tweet?text={{ post.content|urlencode }}&hashtags=SocialMedia"
+   target="_blank" class="btn btn-primary">
+   <i class="fab fa-twitter"></i> Share on X
+</a>
+
+<!-- Facebook Share -->
+<a href="https://www.facebook.com/sharer/sharer.php?u={{ request.build_absolute_uri }}"
+   target="_blank" class="btn btn-primary">
+   <i class="fab fa-facebook"></i> Share on Facebook
+</a>
+
+<!-- LinkedIn Share -->
+<a href="https://www.linkedin.com/sharing/share-offsite/?url={{ request.build_absolute_uri }}"
+   target="_blank" class="btn btn-primary">
+   <i class="fab fa-linkedin"></i> Share on LinkedIn
+</a>
+
+<!-- Instagram (Copy to Clipboard) -->
+<button onclick="copyToClipboard('{{ post.content }}')" class="btn btn-primary">
+   <i class="fab fa-instagram"></i> Copy for Instagram
+</button>
+```
+
+**Files to Update:**
+```
+agents/templates/agents/
+├── post_detail.html         # Add share buttons section
+├── post_edit.html           # Add share buttons in preview area
+└── post_result.html         # Add share buttons to generation results
+
+static/js/
+└── social_share.js          # JavaScript for share functionality
+
+agents/
+├── views.py                 # Add share URL context
+└── models.py                # Optional: Add share tracking
+```
+
+**JavaScript Functions:**
+```javascript
+// Copy content to clipboard for Instagram
+function copyToClipboard(text) {
+    navigator.clipboard.writeText(text).then(() => {
+        alert('Content copied! You can now paste it in Instagram.');
+    });
+}
+
+// Open share window with optimal sizing
+function openShareWindow(url, platform) {
+    const width = platform === 'twitter' ? 550 : 600;
+    const height = platform === 'twitter' ? 420 : 500;
+    window.open(url, 'share', `width=${width},height=${height}`);
+}
+```
+
 ---
 
 ## 🔧 Phase 3: Advanced Features (Week 3-4)

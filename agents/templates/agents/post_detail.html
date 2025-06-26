@@ -31,6 +31,43 @@
                 </small>
             </div>
 
+            <!-- Social Media Share Buttons -->
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h6 class="mb-0"><i class="fas fa-share-alt"></i> Share on Social Media</h6>
+                </div>
+                <div class="card-body">
+                    <div class="d-flex flex-wrap gap-2">
+                        <!-- Twitter/X Share -->
+                        <a href="#" onclick="shareOnTwitter()" class="btn btn-outline-dark">
+                            <i class="fab fa-x-twitter"></i> Share on X
+                        </a>
+
+                        <!-- Facebook Share -->
+                        <a href="#" onclick="shareOnFacebook()" class="btn btn-outline-primary">
+                            <i class="fab fa-facebook"></i> Share on Facebook
+                        </a>
+
+                        <!-- LinkedIn Share -->
+                        <a href="#" onclick="shareOnLinkedIn()" class="btn btn-outline-info">
+                            <i class="fab fa-linkedin"></i> Share on LinkedIn
+                        </a>
+
+                        <!-- Instagram Copy -->
+                        <button onclick="copyForInstagram()" class="btn btn-outline-danger">
+                            <i class="fab fa-instagram"></i> Copy for Instagram
+                        </button>
+                    </div>
+                    <div class="mt-2">
+                        <small class="text-muted">
+                            <i class="fas fa-info-circle"></i>
+                            Click to open native share dialogs for each platform. Instagram content will be copied to
+                            your clipboard.
+                        </small>
+                    </div>
+                </div>
+            </div>
+
             <!-- Post Content -->
             <div class="card mb-4">
                 <div class="card-header">
@@ -138,6 +175,59 @@
         a.click();
         window.URL.revokeObjectURL(url);
         document.body.removeChild(a);
+    }
+
+    // Social Media Share Functions
+    function shareOnTwitter() {
+        const content = document.getElementById('copyTextarea').value;
+        const maxLength = 260; // Leave room for hashtags
+        const truncatedContent = content.length > maxLength ? content.substring(0, maxLength) + '...' : content;
+        const url = `https://twitter.com/intent/tweet?text=${encodeURIComponent(truncatedContent)}&hashtags=SocialMedia,AIGenerated`;
+        openShareWindow(url, 'twitter');
+    }
+
+    function shareOnFacebook() {
+        const currentUrl = window.location.href;
+        const url = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(currentUrl)}`;
+        openShareWindow(url, 'facebook');
+    }
+
+    function shareOnLinkedIn() {
+        const content = document.getElementById('copyTextarea').value;
+        const title = '{{ post.title|escapejs }}';
+        const currentUrl = window.location.href;
+        const url = `https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(currentUrl)}&title=${encodeURIComponent(title)}&summary=${encodeURIComponent(content.substring(0, 200))}`;
+        openShareWindow(url, 'linkedin');
+    }
+
+    function copyForInstagram() {
+        const content = document.getElementById('copyTextarea').value;
+        navigator.clipboard.writeText(content).then(function () {
+            // Show success feedback
+            const btn = event.target.closest('button');
+            const originalText = btn.innerHTML;
+            btn.innerHTML = '<i class="fas fa-check"></i> Copied for Instagram!';
+            btn.classList.remove('btn-outline-danger');
+            btn.classList.add('btn-success');
+
+            // Show alert with instructions
+            alert('Content copied to clipboard!\n\nYou can now:\n1. Open Instagram\n2. Create a new post\n3. Paste the content (Ctrl+V)');
+
+            setTimeout(() => {
+                btn.innerHTML = originalText;
+                btn.classList.remove('btn-success');
+                btn.classList.add('btn-outline-danger');
+            }, 3000);
+        });
+    }
+
+    function openShareWindow(url, platform) {
+        const width = platform === 'twitter' ? 550 : 600;
+        const height = platform === 'twitter' ? 420 : 500;
+        const left = (window.innerWidth - width) / 2;
+        const top = (window.innerHeight - height) / 2;
+
+        window.open(url, 'share', `width=${width},height=${height},left=${left},top=${top},resizable=yes,scrollbars=yes`);
     }
 </script>
 {% endblock %}

@@ -168,6 +168,29 @@
                 <h6 id="previewTitle"></h6>
                 <hr>
                 <div id="previewContent" class="bg-light p-3 rounded"></div>
+
+                <!-- Share Buttons in Preview -->
+                <div class="mt-4">
+                    <h6><i class="fas fa-share-alt"></i> Share Preview</h6>
+                    <div class="d-flex flex-wrap gap-2">
+                        <button onclick="sharePreviewOnTwitter()" class="btn btn-sm btn-outline-dark">
+                            <i class="fab fa-x-twitter"></i> Share on X
+                        </button>
+                        <button onclick="sharePreviewOnFacebook()" class="btn btn-sm btn-outline-primary">
+                            <i class="fab fa-facebook"></i> Share on Facebook
+                        </button>
+                        <button onclick="sharePreviewOnLinkedIn()" class="btn btn-sm btn-outline-info">
+                            <i class="fab fa-linkedin"></i> Share on LinkedIn
+                        </button>
+                        <button onclick="copyPreviewForInstagram()" class="btn btn-sm btn-outline-danger">
+                            <i class="fab fa-instagram"></i> Copy for Instagram
+                        </button>
+                    </div>
+                    <small class="text-muted d-block mt-2">
+                        <i class="fas fa-info-circle"></i> Share the current content (save first to make changes
+                        permanent)
+                    </small>
+                </div>
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
@@ -260,5 +283,56 @@
             return;
         }
     });
+
+    // Social Media Share Functions for Preview
+    function sharePreviewOnTwitter() {
+        const content = document.getElementById('content').value;
+        const maxLength = 260; // Leave room for hashtags
+        const truncatedContent = content.length > maxLength ? content.substring(0, maxLength) + '...' : content;
+        const url = `https://twitter.com/intent/tweet?text=${encodeURIComponent(truncatedContent)}&hashtags=SocialMedia,AIGenerated`;
+        openShareWindow(url, 'twitter');
+    }
+
+    function sharePreviewOnFacebook() {
+        const currentUrl = window.location.href;
+        const url = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(currentUrl)}`;
+        openShareWindow(url, 'facebook');
+    }
+
+    function sharePreviewOnLinkedIn() {
+        const content = document.getElementById('content').value;
+        const title = document.getElementById('title').value || 'Untitled Post';
+        const currentUrl = window.location.href;
+        const url = `https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(currentUrl)}&title=${encodeURIComponent(title)}&summary=${encodeURIComponent(content.substring(0, 200))}`;
+        openShareWindow(url, 'linkedin');
+    }
+
+    function copyPreviewForInstagram() {
+        const content = document.getElementById('content').value;
+        navigator.clipboard.writeText(content).then(function () {
+            const btn = event.target.closest('button');
+            const originalText = btn.innerHTML;
+            btn.innerHTML = '<i class="fas fa-check"></i> Copied!';
+            btn.classList.remove('btn-outline-danger');
+            btn.classList.add('btn-success');
+
+            alert('Content copied to clipboard!\n\nYou can now:\n1. Open Instagram\n2. Create a new post\n3. Paste the content (Ctrl+V)');
+
+            setTimeout(() => {
+                btn.innerHTML = originalText;
+                btn.classList.remove('btn-success');
+                btn.classList.add('btn-outline-danger');
+            }, 3000);
+        });
+    }
+
+    function openShareWindow(url, platform) {
+        const width = platform === 'twitter' ? 550 : 600;
+        const height = platform === 'twitter' ? 420 : 500;
+        const left = (window.innerWidth - width) / 2;
+        const top = (window.innerHeight - height) / 2;
+
+        window.open(url, 'share', `width=${width},height=${height},left=${left},top=${top},resizable=yes,scrollbars=yes`);
+    }
 </script>
 {% endblock %}
